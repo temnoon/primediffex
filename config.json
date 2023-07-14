@@ -1,6 +1,6 @@
 {
-  "num_bits": 1048,
-  "num_primes": 13,
+  "num_bits": 48,
+  "num_primes": 10000,
   "start_number": "random",
   "write_output": true,
   "output_primes": true,
