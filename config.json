@@ -1,0 +1,14 @@
+{
+  "num_bits": 1048,
+  "num_primes": 13,
+  "start_number": "random",
+  "write_output": true,
+  "output_primes": true,
+  "output_second_differences": true,
+  "output_second_ratios": true,
+  "output_sd_sr_combinations": true,
+  "output_named_prime_sets": true,
+  "output_named_prime_sets_totals": true,
+  "miller_rabin_iterations": 6,
+  "prime_generation_feedback": 1
+}
