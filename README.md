@@ -80,6 +80,45 @@ with open('state.pkl', 'rb') as f:
 
 Replace `'state.pkl'` with the path to your pickle file if it's different.
 
+# Changelog
+
+### Version 1.2.0
+- **Added**: New parameter "prime_sets" in config file to specify which prime sets to find.
+- **Changed**: Updated "find_named_prime_sets" function to only compute specified prime sets.
+- **Fixed**: Bug where the software would calculate prime sets twice. 
+- **Fixed**: Bug in the "auto" truncation mode that resulted in overly large truncations.
+
+# README Additions
+
+## Prime Sets
+In addition to exploring prime second differences and second ratios, the Prime Difference Explorer can also find specific sets of primes. The software recognizes the following sets, each identified by the difference between the primes in the set:
+
+- Twin primes (difference of 2)
+- Cousin primes (difference of 4)
+- Sexy primes (difference of 6)
+- Octo primes (difference of 8)
+- Deca primes (difference of 10)
+- Dodeca primes (difference of 12)
+
+To specify which sets you want the software to find, add a "prime_sets" parameter to your configuration file. The value should be a list of the differences that identify each set. For example, to find twin primes and cousin primes, your configuration file would include:
+
+```json
+"prime_sets": [2, 4]
+```
+
+If you want the software to find all the recognized sets, you would use:
+
+```json
+"prime_sets": [2, 4, 6, 8, 10, 12]
+```
+
+If the "prime_sets" parameter is omitted from the configuration file, the software will not find any prime sets.
+
+The software outputs a CSV file for each prime set that it finds. The file contains each pair of primes in the set, identified by their last 10 digits. To reconstitute a full prime from a truncated prime, append the last 10 digits of the prime to the left digits specified in the README file for the dataset.
+
+## Updates in Version 1.2.0
+In this version, we added the ability to specify which prime sets you want the software to find. This allows you to focus on specific sets without having to compute all of them, which can save a significant amount of time and space when dealing with large prime sequences. We also fixed a bug where the software would calculate prime sets twice, and a bug in the "auto" truncation mode that resulted in overly large truncations.
+
 ## Caveat
 
 ChatGPT 4.0 was used in developing this code. 
