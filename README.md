@@ -82,7 +82,7 @@ Replace `'state.pkl'` with the path to your pickle file if it's different.
 
 # Changelog
 
-### Version 1.2.0
+### Version 0.2.0
 - **Added**: New parameter "prime_sets" in config file to specify which prime sets to find.
 - **Changed**: Updated "find_named_prime_sets" function to only compute specified prime sets.
 - **Fixed**: Bug where the software would calculate prime sets twice. 
@@ -116,8 +116,38 @@ If the "prime_sets" parameter is omitted from the configuration file, the softwa
 
 The software outputs a CSV file for each prime set that it finds. The file contains each pair of primes in the set, identified by their last 10 digits. To reconstitute a full prime from a truncated prime, append the last 10 digits of the prime to the left digits specified in the README file for the dataset.
 
-## Updates in Version 1.2.0
+## Updates in Version 0.2.0
 In this version, we added the ability to specify which prime sets you want the software to find. This allows you to focus on specific sets without having to compute all of them, which can save a significant amount of time and space when dealing with large prime sequences. We also fixed a bug where the software would calculate prime sets twice, and a bug in the "auto" truncation mode that resulted in overly large truncations.
+
+## Updates in Version 0.2.1
+
+"random_seed" now supported as a config parameter. Allows the usual control over randomness that seeds afford.
+
+Pickle file now Gzip'd. 
+
+truncation parameter "num_digits": "auto" allows the software to choose the smallest effective truncation when prime is large. 
+
+Sample new config file
+
+```json
+{
+"random_seed": 9999,
+"num_bits": 256,
+"num_primes": 10000,
+"start_number": "random",
+"write_output": true,
+"output_primes": true,
+"output_second_differences": true,
+"output_second_ratios": true,
+"output_sd_sr_combinations": true,
+"output_named_prime_sets": true,
+"output_named_prime_sets_totals": true,
+"miller_rabin_iterations": 5,
+"num_digits": "auto",
+"prime_sets": [2, 4]
+}
+```
+
 
 ## Caveat
 
