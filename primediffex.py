@@ -1,5 +1,5 @@
 '''
-PrimeDiffEx Prime DIfference Explorer - V0.21 Alpha 
+PrimeDiffEx Prime DIfference Explorer - V0.22 Alpha 
 
 Changelog:  15 July 2023 v0.21
 • Support a Random Seed to allow control over the randomness.
