@@ -354,7 +354,191 @@ def run_from_config(config_file):
             write_named_prime_sets_to_csv(named_prime_sets, base_filename)
         if config.get('output_named_prime_sets_totals', True):
             write_named_prime_sets_totals_to_csv(named_prime_sets, base_filename)
-
-
-        
+      
     return primes, second_differences, second_ratios, sd_sr_combinations, named_prime_sets
+
+
+'''
+Animation and Visualization Functions
+
+'''
+
+import warnings
+import os
+from matplotlib import patches, animation
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from fractions import Fraction
+import pandas as pd
+from tqdm import tqdm
+
+def parse_ratio(ratio_str):
+    """Parse a ratio string (like '3/2') into a float."""
+    try:
+        return float(Fraction(ratio_str))
+    except (ZeroDivisionError, ValueError):
+        return 0
+
+def create_ranked_data(data):
+    """Create ranked data for Second Difference and Second Ratio."""
+    data['SD Rank'] = data['Second Difference'].rank(ascending=False)
+    data['SR Rank'] = data['Second Ratio (Decimal)'].rank(ascending=False)
+    return data
+
+
+def load_data(primes_filename, sd_freq_filename, sr_freq_filename, metadata_filename):
+    """Load data from the CSV files and calculate ranks."""
+    # Read the data from the CSV files
+    data = pd.read_csv(primes_filename)
+    
+    # Read the metadata manually to handle large numbers
+    with open(metadata_filename) as f:
+        metadata = json.load(f)
+    if 'first_prime' in metadata:
+        metadata['first_prime'] = str(metadata['first_prime'])
+    if 'last_prime' in metadata:
+        metadata['last_prime'] = str(metadata['last_prime'])
+
+    sd_freq = pd.read_csv(sd_freq_filename).set_index('Second Difference')
+    sr_freq = pd.read_csv(sr_freq_filename)
+
+    # Prepare data
+    data['Second Ratio (Decimal)'] = data['Second Ratio'].apply(parse_ratio)
+    data['Second Ratio (Fraction)'] = data['Second Ratio'].apply(lambda x: 0 if x == '0' else Fraction(x))
+    data['Prime'] = data['Prime'].apply(lambda x: str(x))
+
+    # Determine the maximum second difference in the data
+    max_sd = data['Second Difference'].abs().max()
+
+    # Assign ranks based on frequency
+    sd_freq['Rank'] = sd_freq['Count'].rank(ascending=False)
+    
+    # Assign ranks based on the count for second ratio (multiple SRs with the same count share the same rank)
+    sr_freq['Rank'] = sr_freq.groupby('Count')['Count'].ngroup(ascending=False) + 1
+
+    # Create a dictionary of SR decimal representations and their ranks
+    sr_rank_dict = pd.Series(sr_freq.Rank.values, index=sr_freq['Second Ratio'].apply(parse_ratio)).to_dict()
+
+    # Add ranks back to the data
+    data['SD Rank'] = data['Second Difference'].map(sd_freq['Rank'])
+    data['SR Rank'] = data['Second Ratio (Decimal)'].map(sr_rank_dict)
+
+    return data, metadata, sd_freq, sr_freq, max_sd
+
+
+def create_prime_frame_for_animation(i, data, metadata, max_sd, sd_freq, sr_freq, fig, ax):
+    """Create a single frame for the animation."""
+    ax.clear()  # Clear the current frame
+    ax.set_xlim([-1.1, 1.1])  # Set the x-axis limits
+    ax.set_ylim([-1.1, 1.1])  # Set the y-axis limits
+    ax.set_aspect('equal')  # Change to 'equal' to ensure circles are not elliptical
+
+    # Get prime, SD, SR, and their ranks
+    prime = data['Prime'][i]
+    sd = data['Second Difference'][i]
+    sr_decimal = data['Second Ratio (Decimal)'][i]
+    sr_fraction = data['Second Ratio (Fraction)'][i]
+    sd_rank = data['SD Rank'][i]
+    sr_rank = data['SR Rank'][i]
+
+    # Get color and info for SD and SR
+    sd_color = plt.get_cmap('rainbow')(sd_rank / len(sd_freq))
+    sr_color = plt.get_cmap('rainbow')(sr_rank / len(sr_freq))
+
+    # Inner circle (particle)
+    particle = patches.Circle((float(sr_decimal), 0), radius=0.05, color=sr_color, linewidth=2)    
+    ax.add_artist(particle)
+
+    # Second difference (SD) circle
+    sd_radius = abs(sd) / max_sd
+    sd_circle = patches.Circle((0, 0), radius=sd_radius, edgecolor=sd_color, fill=False, linewidth=2)
+    ax.add_artist(sd_circle)
+
+    # Add SD and SR values to the plot
+    ax.text(0, sd_radius, f'{sd}', va='bottom', ha='center', fontsize=14, bbox=dict(boxstyle='round', facecolor=sd_color, alpha=0.5))
+    ax.text(0, -0.1, str(sr_fraction), va='top', ha='center', fontsize=14, color='black')
+
+    # Add SD, SR, and prime info to the title
+    last_prime = int(str(metadata['last_prime']))
+    last_num_bits = last_prime.bit_length()
+    start_prime_length = len(str(metadata['last_prime']))
+    prime_info = f'\nDataset Ending Bits: {last_num_bits} Dataset Ending # of Digits: {start_prime_length}\nLast digits of Prime: {prime}'
+    ax.set_title(f'{prime_info}\nSecond Difference: {sd} (Rank: {sd_rank})\nSecond Ratio: {str(sr_fraction)} (Rank: {sr_rank})')
+
+    return [particle, sd_circle]
+
+
+
+def run_config_animation(directory_path):
+    """Generate the animation from files in the specified directory."""
+    import os
+    import json
+
+    # Get the prefix from the directory name
+    prefix = os.path.basename(directory_path).split("_")[0]
+
+    # Check if all necessary files exist
+    necessary_files = [
+        f"{prefix}_primes.csv",
+        f"{prefix}_sd.csv",
+        f"{prefix}_sr.csv",
+        "metadata.json",
+    ]
+    for filename in necessary_files:
+        if not os.path.isfile(os.path.join(directory_path, filename)):
+            raise FileNotFoundError(f"Missing necessary file: {filename}")
+
+    # Load the metadata
+    with open(os.path.join(directory_path, "metadata.json")) as f:
+        metadata = json.load(f)
+
+    # Get the output filename
+    output_filename = os.path.join(directory_path, f"{prefix}_animation.mp4")
+
+    # Run the animation
+    create_prime_animation(
+        os.path.join(directory_path, f"{prefix}_primes.csv"),
+        os.path.join(directory_path, f"{prefix}_sd.csv"),
+        os.path.join(directory_path, f"{prefix}_sr.csv"),
+        os.path.join(directory_path, "metadata.json"),
+        output_filename
+    )
+
+    print(f"Animation saved to: {output_filename}")
+
+
+def create_prime_animation(primes_filename, sd_freq_filename, sr_freq_filename, metadata_filename, output_filename):
+    """Create an animation of prime numbers, showing the second difference and second ratio."""
+    
+    #with warnings.catch_warnings():  # Suppress warnings
+    #    warnings.simplefilter('ignore')
+
+    # Load the data
+    print("Loading data...")
+    data, metadata, sd_freq, sr_freq, max_sd = load_data(primes_filename, sd_freq_filename, sr_freq_filename, metadata_filename)
+    
+    # Set up the figure
+    print("Setting up the figure...")
+    fig, ax = plt.subplots(figsize=(10,10))
+
+    # Create the animation
+    print("Creating the animation...")
+    with warnings.catch_warnings():  # Suppress warnings
+        warnings.simplefilter('ignore')
+
+    def update(num):
+        ax.clear()
+        artists = create_prime_frame_for_animation(num, data, metadata, max_sd, sd_freq, sr_freq, fig, ax)
+        pbar.update()
+        return artists
+    pbar = tqdm(total=len(data), ncols=70)
+    ani = FuncAnimation(fig, update, frames=len(data), interval=200, blit=True)
+
+    # Save the animation to a file
+    print(f"Saving the animation to {output_filename}...")
+    ani.save(output_filename, writer=animation.FFMpegWriter(fps=5))
+    pbar.close()
+
+    # Return the animation
+    print("Animation created successfully!")
+    return ani
