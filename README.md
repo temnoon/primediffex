@@ -9,13 +9,13 @@ Prime Explorer is a Python project that explores the properties of prime numbers
 
 1. Ensure that you have Python 3.6 or later installed.
 
-2. Install the required Python packages by running `pip install -r requirements.txt` in your terminal. (This only needs to install sympy)
+2. Install the required Python packages by running `pip install -r requirements.txt` in your terminal. The addition of the animation and visualization function with v0.22 requires several packages, beyond the sympy required by the prime generation. 
 
-3. Modify the `config.json` file to specify your desired parameters for the prime number generation and analysis. The parameters you can specify are described in the "Configuration Parameters" section below.
+4. Modify the `config.json` file to specify your desired parameters for the prime number generation and analysis. The parameters you can specify are described in the "Configuration Parameters" section below.
 
-4. I run the software with "primes, sd, sr, sd_sr_combinations, named_prime_sets = run_from_config('config.json')" in a Jupyter notebook, connected to the home directory of the app. 
+5. I run the software with "primes, sd, sr, sd_sr_combinations, named_prime_sets = run_from_config('config.json')" in a Jupyter notebook, connected to the home directory of the app. 
 
-5. The script will generate the prime numbers and perform the analyses as specified in your `config.json` file. The results will be written to output files in the same directory as the script.
+6. The script will generate the prime numbers and perform the analyses as specified in your `config.json` file. The results will be written to output files in the same directory as the script.
 
 ## Configuration Parameters
 
