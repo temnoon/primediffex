@@ -40,8 +40,8 @@ In the `config.json` file, you can specify the following parameters:
 - `output_named_prime_sets_totals`: Whether to output a CSV file with the total counts of the named prime sets.
 
 - `miller_rabin_iterations`: The number of iterations to use in the Miller-Rabin primality test.
-- 'num-digits': best practice is to set this to 'auto' to allow the software to determine the number of digits needed to be displayed, so extras can be truncated for long primes.
-- 'prime_sets': a list of the gap between primes which should be captured by prime sets. Capturing all in large dataset can get very large. The largest set the software is prepared to deal with is [2,4,6,8,10,12]. Any smaller subset should work. 
+- `num-digits`: best practice is to set this to 'auto' to allow the software to determine the number of digits needed to be displayed, so extras can be truncated for long primes.
+- `prime_sets`: a list of the gap between primes which should be captured by prime sets. Capturing all in large dataset can get very large. The largest set the software is prepared to deal with is [2,4,6,8,10,12]. Any smaller subset should work. 
 
 
 ## Output Files
