@@ -1,13 +1,15 @@
 {
-  "num_bits": 48,
-  "num_primes": 10000,
-  "start_number": "random",
-  "write_output": true,
-  "output_primes": true,
-  "output_second_differences": true,
-  "output_second_ratios": true,
-  "output_sd_sr_combinations": true,
-  "output_named_prime_sets": true,
-  "output_named_prime_sets_totals": true,
-  "miller_rabin_iterations": 6
+"num_bits": 10,
+"num_primes": 1000,
+"start_number": 1,
+"write_output": true,
+"output_primes": true,
+"output_second_differences": true,
+"output_second_ratios": true,
+"output_sd_sr_combinations": true,
+"output_named_prime_sets": true,
+"output_named_prime_sets_totals": true,
+"miller_rabin_iterations": 5,
+"num_digits": "auto",
+"prime_sets": [2, 4]
 }
