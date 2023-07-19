@@ -5,13 +5,25 @@
 
 Prime Explorer is a Python project that explores the properties of prime numbers. It generates prime numbers, calculates their second differences and second ratios, identifies specific sets of primes (such as twin primes, cousin primes, and others), and writes these results to various output files.
 
+## Introduction
+
+The Prime Difference Explorer was created as a tool to delve deeper into the study of prime second differences. In 2017, two new integer sequences related to prime second differences were accepted to the Online Encyclopedia of Integer Sequences (OEIS):
+
+- [A295746](https://oeis.org/A295746): Distinct second differences in the sequence of primes in order of appearance.
+- [A295973](https://oeis.org/A295973): Primes introducing new second differences in A036263.
+
+These sequences reveal patterns and trends within the 'landscape' of prime numbers. They are, in a sense, like a mathematical coastline: intricate, unchanging, and timeless.
+
+This software was developed to facilitate the exploration of these sequences. It provides a means to generate and analyse large sequences of prime numbers, their second differences, and their second ratios. With the Prime Difference Explorer, you can map this intriguing mathematical space at your own pace, gaining deeper insights into the timeless patterns of prime numbers. Enjoy the journey!
+
 # Second Differences and Second Ratios of Prime Numbers
 
 In number theory, the sequence of prime numbers is of fundamental importance. While we understand a lot about how primes are distributed (for instance, the Prime Number Theorem gives us an approximation for how many primes are less than a given size), there are still many open questions related to the properties of primes. My interest is more in these sequences, which just exist out there in the field of prime relations, in a precise and discoverable way. I see this software as a way of exploring and mapping an enormous universe of simple inevitable and timeless values which are bound as attributes to specific primes. 
 
 ## Second Differences
 
-The Second Difference of a sequence is a measure of how the differences between terms in the sequence change. For the sequence of prime numbers, the First Difference between two primes \(p_{n+1}\) and \(p_n\) is simply the gap between them: \(p_{n+1} - p_n\). 
+(https://oeis.org/A036263)
+The Second Difference of a sequence is a measure of how the differences between terms in the sequence change. For the sequence of prime numbers, the First Difference between two primes $`(p_{n+1})`$ and $`(p_n)`$ is simply the gap between them: $`(p_{n+1} - p_n)`$. 
 
 For example, if we have the sequence of prime numbers 2, 3, 5, 7, 11, the First Differences are 1 (3-2), 2 (5-3), 2 (7-5), and 4 (11-7).
 
@@ -21,16 +33,13 @@ Second Differences can give us insights into how the gaps between primes change.
 
 ## Second Ratios
 
-The Second Ratio of a sequence is a measure of how the ratios between terms in the sequence change. For the sequence of prime numbers, the First Ratio between two primes \(p_{n+1}\) and \(p_n\) is the ratio between them: \(p_{n+1} / p_n\). 
+The Second Ratio of a sequence is a measure of how the ratios between terms in the sequence change. For the sequence of prime numbers, the First Ratio between two primes $`(p_{n+1})`$ and $`(p_n)`$ is the ratio between them: $`(p_{n+1} / p_n)`$. 
 
 For example, if we have the sequence of prime numbers 2, 3, 5, 7, 11, the First Ratios are 1.5 (3/2), 1.67 (5/3), 1.4 (7/5), and 1.57 (11/7).
 
 The Second Ratio is then the ratio of these First Ratios. In our example, the Second Ratios are 1.11 (1.67/1.5), 0.84 (1.4/1.67), and 1.12 (1.57/1.4).
 
-Second Ratios can give us insights into how the relative sizes of primes change. Studying these can provide us with deeper understanding of prime distribution and density.
-
-Keep in mind that while these properties can provide insights into the nature of prime numbers, many aspects about the distribution of primes remain deeply mysterious and are the subject of ongoing research in number theory.
-
+Second Ratios can give us insights into the relative distance between a specific prime and its prime neighbors. Second ratios are always rational numbers. As the numbers get larger, there get to be more and more second ratios appearing between old ones, but as far as I have found, the same most common second ratios are still the most common to as far out as my computer would let me go. That is, 1/3 and -1/3, are the undisputed most common second ratios as long as the dataset is long enough relative to the neighborhood it is running between, with 0, 2/3, -2/3 and 1/2 the closest runner-ups. 
 
 ## How to Run the Prime Difference Explorer
 
@@ -164,61 +173,19 @@ calculate_sr_bias('your_file_here.csv')
 These functions will return a bias score, which represents the bias towards positive or negative second differences or second ratios in the data. The score is a number between -1 and 1, where -1 indicates a bias towards negative values, 1 indicates a bias towards positive values, and 0 indicates no bias.
 
 ### About the Miller-Rabin Algorithm
+Sure, here's a suggested section about the Miller-Rabin primality test for the README:
 
-The Miller-Rabin algorithm is a probabilistic test to check whether a number is a composite or probably prime. It was first discovered by Gary L. Miller and later improved by Michael O. Rabin.
+## Miller-Rabin Primality Test
 
-The algorithm is based on the following claim:
+The Prime Explorer makes use of the Miller-Rabin primality test to generate sequences of prime numbers. This is a probabilistic test, which means that there is a small chance that it may incorrectly identify a composite (non-prime) number as prime. The likelihood of a false positive decreases as more rounds of testing are performed.
 
-**Claim:** Let \( n \) be an odd prime number and \( n-1 = 2^s \cdot d \) with \( d \) odd. Then for any number \( a \) such that \( 2 \leq a \leq n-2 \), one of the following statements is true:
-1. \( a^d \equiv 1 \mod n \)
-2. \( a^{2^r \cdot d} \equiv -1 \mod n \) for some \( r \) such that \( 0 \leq r \leq s-1 \)
+In the Prime Explorer, the number of Miller-Rabin iterations can be controlled using the `miller_rabin_iterations` parameter in the configuration file. The larger the value of this parameter, the higher the confidence in the results, but also the longer the computation time.
 
-In other words, if \( n \) is a prime number, then either \( a^d \) is 1 modulo \( n \), or \( a^{2^r \cdot d} \) is -1 modulo \( n \) for some \( r \). If neither of these conditions is met, then \( n \) is definitely composite.
+For instance, setting `miller_rabin_iterations` to 5, the default value, provides a confidence level of approximately $`(1 - 2^{-10})`$ (or about 99.9%) that the identified primes are indeed prime. If you increase `miller_rabin_iterations` to 10, the confidence level increases to approximately $`(1 - 2^{-20})`$, and so on. 
 
-The Miller-Rabin algorithm uses this claim to test whether a number is prime. It picks a random number \( a \), and checks whether the claim holds. If the claim fails to hold, then \( n \) is composite. If the claim holds, then \( n \) is probably prime. By repeating the test with multiple randomly chosen values of \( a \), we can increase our confidence that \( n \) is indeed prime. 
+Please note that for large sequences of primes, even a high confidence level may still result in some false positives. However, the Miller-Rabin test is generally quite effective and is a good balance of performance and accuracy for generating large sequences of prime numbers.
 
-Here is the pseudocode for the Miller-Rabin primality test:
-
-```
-Input: n > 2, an odd integer to be tested for primality;
-       k, a parameter that determines the number of times the test is repeated
-
-write n − 1 as 2^r·d with d odd by factoring powers of 2 from n − 1
-
-LOOP repeat k times:
-    pick a random integer a in the range [2, n − 2]
-    x ← a^d mod n
-    if x = 1 or x = n − 1 then do next LOOP
-    for i = 1 to r − 1
-        x ← x^2 mod n
-        if x = n − 1 then do next LOOP
-    return composite
-
-return probably prime
-```
-
-You can use a fixed random seed and control the number of iterations to make the test deterministic. The random seed is used to generate the random integers \( a \), and the number of iterations determines how many times the test is repeated. By fixing these values, you can get the same result every time you run the test.
-
-For example, in Python:
-
-```python
-import random
-
-def miller_rabin(n, k, seed=1):
-    # Use the seed for the random number generator
-    random.seed(seed)
-
-    # The rest of the algorithm as described in the pseudocode...
-
-# Run the test with a fixed seed and a specific number of iterations
-print(miller_rabin(561, 5, seed=12345))  # Prints 'composite'
-```
-
-This will give the same result every time it is run, because the random numbers generated by `random.randint(2, n - 2)` will be the same every time.
-
-Please note that while the Miller-Rabin test is very fast and accurate for small numbers, it is a probabilistic test and there is a very small chance that it can report a composite number as "probably prime". The chance of a false positive decreases as the number of iterations increases. 
-
-Also, note that using a fixed seed for the random number generator can impact the accuracy of the test, because it always tests the same sequence of 'a' values. It is generally better to use a different random seed each time you run the test, unless you have a specific reason for wanting the results to be deterministic.
+It is up to the user to decide the balance between the speed of generating primes and the confidence in the results. It is recommended to use a value of 5 for the `miller_rabin_iterations` parameter, as this provides a high level of confidence while still maintaining good performance.
 
 ## Loading the Pickle File
 
